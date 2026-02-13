@@ -258,15 +258,31 @@ class MainFrame(wx.Frame):
         self.lbl_stereo_format = wx.StaticText(self.grp_stereo, label=T("Stereo Format"))
         self.cbo_stereo_format = wx.ComboBox(
             self.grp_stereo,
-            choices=["Half SBS", "Full SBS", "RGB-D", "Half RGB-D"],
+            choices=[
+                "Half SBS", "Full SBS",
+                "Half TB", "Full TB",
+                "Cross Eyed",
+                "RGB-D", "Half RGB-D",
+                "Anaglyph",
+            ],
             name="cbo_stereo_format")
         self.cbo_stereo_format.SetEditable(False)
         self.cbo_stereo_format.SetSelection(0)
+
+        self.lbl_anaglyph_method = wx.StaticText(self.grp_stereo, label=T("Anaglyph Method"))
+        self.cbo_anaglyph_method = wx.ComboBox(
+            self.grp_stereo,
+            choices=["dubois", "dubois2",
+                     "color", "gray",
+                     "half-color",
+                     "wimmer", "wimmer2"],
+            name="cbo_anaglyph_method")
+        self.cbo_anaglyph_method.SetEditable(False)
+        self.cbo_anaglyph_method.SetSelection(0)
+        self.lbl_anaglyph_method.Hide()
+        self.cbo_anaglyph_method.Hide()
+
         self.lbl_format_device = wx.StaticText(self.grp_stereo, label=T(""))
-        self.chk_cross_eyed = wx.CheckBox(self.grp_stereo, label=T("Cross Eyed"), name="chk_cross_eyed")
-        self.chk_cross_eyed.SetToolTip(T("Swap left image and right image"))
-        self.chk_cross_eyed.SetValue(False)
-        self.chk_cross_eyed.Hide()
 
         layout = wx.GridBagSizer(vgap=4, hgap=4)
         layout.SetEmptyCellSize((0, 0))
@@ -297,8 +313,9 @@ class MainFrame(wx.Frame):
         layout.Add(self.chk_preserve_screen_border, (i := i + 1, 0), (0, 1), flag=wx.ALIGN_CENTER_VERTICAL)
         layout.Add(self.lbl_stereo_format, (i := i + 1, 0), flag=wx.ALIGN_CENTER_VERTICAL)
         layout.Add(self.cbo_stereo_format, (i, 1), (1, 2), flag=wx.EXPAND)
-        layout.Add(self.chk_cross_eyed, (i := i + 1, 0), flag=wx.ALIGN_CENTER_VERTICAL)
-        layout.Add(self.lbl_format_device, (i, 1), (1, 2), flag=wx.EXPAND | wx.ALIGN_CENTER_VERTICAL)
+        layout.Add(self.lbl_anaglyph_method, (i := i + 1, 0), flag=wx.ALIGN_CENTER_VERTICAL)
+        layout.Add(self.cbo_anaglyph_method, (i, 1), (1, 2), flag=wx.EXPAND)
+        layout.Add(self.lbl_format_device, (i := i + 1, 1), (1, 2), flag=wx.EXPAND | wx.ALIGN_CENTER_VERTICAL)
 
         sizer_stereo = wx.StaticBoxSizer(self.grp_stereo, wx.VERTICAL)
         sizer_stereo.Add(layout, 1, wx.ALL | wx.EXPAND, 4)
@@ -676,6 +693,8 @@ class MainFrame(wx.Frame):
         self.update_compile()
 
         self.grp_adjustment.Hide()
+
+        self.btn_start.SetFocus()
         self.Fit()
 
     def get_depth_models(self, small_only):
@@ -735,6 +754,13 @@ class MainFrame(wx.Frame):
             self.cbo_stream_height,
         ]
         return editable_comboboxes
+
+    def get_anaglyph_method(self):
+        if self.cbo_stereo_format.GetValue() == "Anaglyph":
+            anaglyph = self.cbo_anaglyph_method.GetValue()
+        else:
+            anaglyph = None
+        return anaglyph
 
     def on_close(self, event):
         self.save_preset()
@@ -852,14 +878,13 @@ class MainFrame(wx.Frame):
 
     def update_stereo_format(self, *args, **kwargs):
         stereo_format = self.cbo_stereo_format.GetValue()
-        self.chk_cross_eyed.Show()
-        if stereo_format == "Half SBS":
+        if stereo_format in {"Half SBS", "Half TB"}:
             self.lbl_format_device.SetLabel("Meta Quest 2/3")
-        elif stereo_format == "Full SBS":
+        elif stereo_format in {"Full SBS", "Full TB"}:
             self.lbl_format_device.SetLabel("PICO 4")
         else:
             self.lbl_format_device.SetLabel("")
-            self.chk_cross_eyed.Hide()
+        self.update_anaglyph_state()
 
     def update_edge_dilation(self):
         if self.cbo_edge_dilation_y.GetValue():
@@ -880,6 +905,15 @@ class MainFrame(wx.Frame):
     def on_selected_index_changed_cbo_method(self, event):
         self.update_divergence_warning()
         self.update_preserve_screen_border()
+
+    def update_anaglyph_state(self):
+        if self.cbo_stereo_format.GetValue() == "Anaglyph":
+            self.lbl_anaglyph_method.Show()
+            self.cbo_anaglyph_method.Show()
+        else:
+            self.lbl_anaglyph_method.Hide()
+            self.cbo_anaglyph_method.Hide()
+        self.GetSizer().Layout()
 
     def update_ema_normalize(self):
         if self.chk_ema_normalize.IsChecked():
@@ -958,9 +992,15 @@ class MainFrame(wx.Frame):
             resolution = int(resolution)
 
         parser = create_parser()
+
         full_sbs = self.cbo_stereo_format.GetValue() == "Full SBS"
+        tb = self.cbo_stereo_format.GetValue() == "Full TB"
+        half_tb = self.cbo_stereo_format.GetValue() == "Half TB"
+        cross_eyed = self.cbo_stereo_format.GetValue() == "Cross Eyed"
         rgbd = self.cbo_stereo_format.GetValue() == "RGB-D"
         half_rgbd = self.cbo_stereo_format.GetValue() == "Half RGB-D"
+        anaglyph = self.get_anaglyph_method()
+
         device_id = int(self.cbo_device.GetClientData(self.cbo_device.GetSelection()))
         device_id = [device_id]
 
@@ -1030,7 +1070,7 @@ class MainFrame(wx.Frame):
             resolution=resolution,
             autocrop=self.cbo_autocrop.GetValue() if self.cbo_autocrop.GetValue() else None,
             compile=self.chk_compile.IsEnabled() and self.chk_compile.IsChecked(),
-            cross_eyed=self.chk_cross_eyed.IsChecked(),
+
             screenshot=self.cbo_screenshot.GetValue(),
             monitor_index=monitor_index,
             window_name=window_name,
@@ -1038,9 +1078,16 @@ class MainFrame(wx.Frame):
             crop_left=crop_left,
             crop_right=crop_right,
             crop_bottom=crop_bottom,
+
+            # in iw3.desktop, half_sbs by default
             full_sbs=full_sbs,
+            tb=tb,
+            half_tb=half_tb,
+            cross_eyed=cross_eyed,
             rgbd=rgbd,
             half_rgbd=half_rgbd,
+            anaglyph=anaglyph,
+
             pad_mode=pad_mode,
 
             **viewer_kwargs,
