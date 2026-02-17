@@ -22,6 +22,12 @@ filelock
 timm
 av==15.0.0
 
+# iw3-player
+fastapi
+hypercorn
+pysubs2
+pyopenssl
+
 # depthpro da3
 pillow_heif
 # da3
