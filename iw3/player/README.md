@@ -3,7 +3,7 @@
 [日本語](README_ja.md)
 
 iw3-player is a self-hosted, specialized viewing environment for stereoscopic media.  
-It allows you to stream media converted to 3D via **iw3** from your PC and enjoy it on VR devices through a WebXR application.
+It allows you to stream media that has been pre-converted to 3D with iw3 from your PC and enjoy it on VR devices through a WebXR application.
 
 The player supports a wide range of operations for stereo media.  
 One of its features is to instantly adjust people in photos to life-size.  
