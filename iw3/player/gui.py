@@ -340,6 +340,12 @@ def main():
 
     global LOCALE_DICT
 
+    try:
+        from .download_assets import main as download_main
+        download_main()
+    except ImportError:
+        pass
+
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("--lang", type=str, choices=list(LOCALES.keys()), help="translation language")
     args = parser.parse_args()

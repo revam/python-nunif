@@ -1,4 +1,3 @@
-# TODO: not tested
 import os
 from os import path
 import shutil
@@ -7,14 +6,14 @@ from nunif.logger import logger
 from .dir_config import VERSION_DIR
 
 
-IW3_PLAYER_ROOT = path.dirnme(__file__)  # TODO: package
-URL_TEMPALTE = "https://github.com/nagadomi/nunif/releases/download/iw3-player/{name}_{version}.zip"
+IW3_PLAYER_ROOT = path.dirname(__file__)  # TODO: package
+URL_TEMPALTE = "https://github.com/nagadomi/nunif/releases/download/iw3_player_assets/iw3_player_{name}_{version}.zip"
 ASSET_VERSIONS = {
     "lib": "20260212",
     "fonts": "20260215",
     "lut": "20260217",
     "environments": "20260213",
-    "example": "20260205",
+    "example": "20260217",
 }
 ASSERT_CLEAN_DIR = {
     "lib": [path.join(IW3_PLAYER_ROOT, "public", "lib")],
@@ -39,7 +38,7 @@ def main():
                     shutil.rmtree(clean_dir)
 
             url = URL_TEMPALTE.format(name=name, version=version)
-            downloder = AssetDownloader(url, name=f"iw3-player {name}-{version}", format="zip")
+            downloder = AssetDownloader(url, name=f"iw3_player_{name}_{version}", format="zip")
             downloder.run()
             with open(version_file, mode="w") as f:
                 f.write(version)
