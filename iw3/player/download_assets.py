@@ -29,6 +29,10 @@ class AssetDownloader(ArchiveDownloader):
 
 def main():
     os.makedirs(VERSION_DIR, exist_ok=True)
+    ignore_file = path.join(VERSION_DIR, "ignore")
+    if path.exists(ignore_file):
+        return
+
     for name, version in ASSET_VERSIONS.items():
         version_file = path.join(VERSION_DIR, f"{name}_{version}")
         if not path.exists(version_file):
