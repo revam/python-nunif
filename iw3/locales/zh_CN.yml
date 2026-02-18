@@ -149,3 +149,7 @@
 "Swap left image and right image": "交换左右图像"
 "AutoCrop": "自动剪裁"
 "Enable model compiling": "启用模型编译"
+
+# iw3.player
+"Media Directory": "媒体目录"
+"Please select a valid Media Directory.": "请选择有效的媒体目录。"
