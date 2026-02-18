@@ -7,8 +7,8 @@ iw3で3Dに変換済みのメディアをPC側から配信し、VRデバイス�
 特に静止画像においては一瞬の操作で人物を実物大に調節可能です。  
 写真を実物大で表示することで、没入感が大幅に向上し、VRの中で思い出が鮮やかに蘇ります。
 
-[スクリーンショット]()
-
+![Screenshot](https://github.com/user-attachments/assets/708d03bc-da99-4cdb-a8e4-2ec247e7e3a2)
+o
 ## 動作環境
 
 - **バックエンド（Python）**: Linux, Windows で動作確認済み。
@@ -35,7 +35,7 @@ Meta Quest 2では、4K動画もスムーズに再生できました。
 `iw3-player-gui.bat` を実行すると GUI 画面が起動します。
 `iw3-player-gui.bat`が存在しない場合は、`update.bat`の後に`update-installer.bat`を実行すると現れます。
 
-[イメージ]()
+![GUI](https://github.com/user-attachments/assets/bdf2666e-bd2a-4b3f-827b-fb95be174507)
 
 ### コマンドライン（CLI）
 
