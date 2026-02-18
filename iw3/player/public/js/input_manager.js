@@ -6,9 +6,9 @@ import { UIUtils } from './ui_common.js';
  * Normalizes inputs from VR controllers, Mouse, and Keyboard into semantic Actions.
  */
 class InputManager {
-    constructor(stereoPlayer) {
+    constructor(stereoPlayer, uiManager) {
         this.player = stereoPlayer;
-        this.ui = null;
+        this.ui = uiManager;
 
         // VR Controller State
         this.isStickReset = [true, true];
@@ -29,10 +29,6 @@ class InputManager {
 
         this.setupKeyboardEvents();
         this.setupMouseEvents();
-    }
-
-    setUIManager(ui) {
-        this.ui = ui;
     }
 
     setupMouseEvents() {

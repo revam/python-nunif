@@ -24,7 +24,6 @@ class StereoPlayer extends THREE.Group {
         // Managers
         this.galleryManager = new GalleryManager(debugLogInstance);
         this.environmentManager = new EnvironmentManager(scene, debugLogInstance);
-        this.inputManager = new InputManager(this);
         this.scene.add(this.environmentManager);
 
         // Screen & Subtitle
@@ -35,7 +34,7 @@ class StereoPlayer extends THREE.Group {
         this.stereoScreen.add(this.subtitleWindow);
 
         this.uiManager = new UIManager(scene, camera, renderer, debugLogInstance, this);
-        this.inputManager.setUIManager(this.uiManager);
+        this.inputManager = new InputManager(this, this.uiManager);
 
         // Controller tracking
         this.controllers = [null, null];

@@ -340,7 +340,7 @@ class UIManager extends THREE.Group {
     }
 
     hideMainMenu(force = false) { if (this.isMainMenuVisible || force) { this.visible = this.isMainMenuVisible = false; this.switchSubMenu(null); } }
-    toggleMainMenuVisibility() { if (this.isMainMenuVisible) this.showMainMenu(); else this.hideMainMenu(); }
+    toggleMainMenuVisibility() { if (this.isMainMenuVisible) this.hideMainMenu(); else this.showMainMenu(); }
     toggleScreenSettingsVisibility() { this.switchSubMenu(this.screenSettings); }
     toggleColorSettingsVisibility() { this.switchSubMenu(this.colorSettings); }
     toggleEnvironmentSettingsVisibility() { this.switchSubMenu(this.environmentSettings); }
