@@ -246,7 +246,8 @@ To solve this, use the **Eye Separation** setting in the Subtitle menu to add si
 
 ## About the Development Environment
 
-iw3-player was developed through the chat interface of [gemini-cli](https://github.com/google-gemini/gemini-cli). More than 99% of the backend and frontend code was written by Gemini based on detailed specifications and iterative feedback.
+iw3-player was developed through the chat interface of [gemini-cli](https://github.com/google-gemini/gemini-cli).
+More than 99% of the backend and frontend code was written by Gemini based on detailed specifications and my repeated feedback during testing.
 
 The initial development spanned approximately two weeks with a cost of about $100 in Gemini API Key (Tier 1) usage.
 
