@@ -38,7 +38,7 @@ def main():
         if not path.exists(version_file):
             clean_dirs = ASSERT_CLEAN_DIR.get(name, [])
             for clean_dir in clean_dirs:
-                if path.commonpath([IW3_PLAYER_ROOT, clean_dir]) == IW3_PLAYER_ROOT:
+                if path.commonpath([IW3_PLAYER_ROOT, clean_dir]) == IW3_PLAYER_ROOT and path.exists(clean_dir):
                     shutil.rmtree(clean_dir)
 
             url = URL_TEMPALTE.format(name=name, version=version)
