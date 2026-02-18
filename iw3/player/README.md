@@ -9,7 +9,7 @@ The player supports a wide range of operations for stereo media.
 One of its features is to instantly adjust people in photos to life-size.  
 Viewing photos at a realistic scale significantly enhances immersion and brings your memories to life in VR.
 
-[Screenshots]()
+![Screenshot](https://github.com/user-attachments/assets/708d03bc-da99-4cdb-a8e4-2ec247e7e3a2)
 
 ## Operating Environment
 
@@ -36,7 +36,7 @@ The stereo format is estimated according to the tags in the filename output by i
 Execute `iw3-player-gui.bat` to launch the graphical user interface (GUI).
 If `iw3-player-gui.bat` is missing, run `update.bat` followed by `update-installer.bat` to generate it.
 
-[Image]()
+![GUI](https://github.com/user-attachments/assets/bdf2666e-bd2a-4b3f-827b-fb95be174507)
 
 ### Command Line (CLI)
 
