@@ -77,6 +77,7 @@ class UIManager extends THREE.Group {
             recursive: true
         });
         this.xrPointers = [null, null];
+        this.ignorePointerUntilReleased = [false, false];
 
         this.visible = false;
         this.currentZ = DEFAULTS.uiZ;
@@ -329,17 +330,37 @@ class UIManager extends THREE.Group {
         }
     }
 
-    showMainMenu() {
+    showMainMenu(triggeringControllerIndex = -1) {
         if (!this.mainContainer) return;
+
+        // If opened via VR controller trigger, we must ensure any active 'down' state
+        // is cleared BEFORE the menu becomes visible. Otherwise, the 'up' event
+        // (selectend) might trigger a click on a menu button that just appeared.
+        if (triggeringControllerIndex !== -1 && this.xrPointers[triggeringControllerIndex]) {
+            const pointer = this.xrPointers[triggeringControllerIndex];
+            if (pointer.getButtonsDown().has(0)) {
+                const ev = { pointerId: pointer.id, button: 0, buttons: 0, timeStamp: performance.now() };
+                pointer.up(ev);
+            }
+            this.ignorePointerUntilReleased[triggeringControllerIndex] = true;
+        }
+
         const pos = new THREE.Vector3(), quat = new THREE.Quaternion();
         this.camera.updateMatrixWorld(true); this.camera.getWorldPosition(pos); this.camera.getWorldQuaternion(quat);
         this.position.copy(pos); this.quaternion.copy(quat);
         this.visible = this.isMainMenuVisible = true;
         this.smoothedOcclusion = 0; this.currentZ = DEFAULTS.uiZ;
+
         this.syncUI(true);
     }
 
-    hideMainMenu(force = false) { if (this.isMainMenuVisible || force) { this.visible = this.isMainMenuVisible = false; this.switchSubMenu(null); } }
+    hideMainMenu(force = false) { 
+        if (this.isMainMenuVisible || force) { 
+            this.visible = this.isMainMenuVisible = false; 
+            this.switchSubMenu(null); 
+            this.ignorePointerUntilReleased = [false, false];
+        } 
+    }
     toggleMainMenuVisibility() { if (this.isMainMenuVisible) this.hideMainMenu(); else this.showMainMenu(); }
     toggleScreenSettingsVisibility() { this.switchSubMenu(this.screenSettings); }
     toggleColorSettingsVisibility() { this.switchSubMenu(this.colorSettings); }
@@ -951,10 +972,24 @@ class UIManager extends THREE.Group {
             for (let i = 0; i < 2; i++) {
                 const c = this.stereoPlayer.controllers[i]; if (!c) continue;
                 if (!this.xrPointers[i]) this.xrPointers[i] = createRayPointer(() => this.camera, { current: c }, {}, { intersectionRecursive: true });
-                const pointer = this.xrPointers[i]; const pressed = this.stereoPlayer.gamepads[i]?.buttons[0].pressed;
+                const pointer = this.xrPointers[i]; 
+                const pressed = this.stereoPlayer.gamepads[i]?.buttons[0].pressed;
+                
                 const ev = { pointerId: pointer.id, button: 0, buttons: pressed ? 1 : 0, timeStamp: performance.now() };
                 pointer.move(this.scene, ev);
-                if (pressed && !pointer.getButtonsDown().has(0)) pointer.down(ev); else if (!pressed && pointer.getButtonsDown().has(0)) pointer.up(ev);
+                
+                if (pressed) {
+                    if (!this.ignorePointerUntilReleased[i] && !pointer.getButtonsDown().has(0)) {
+                        pointer.down(ev);
+                    }
+                } else {
+                    if (pointer.getButtonsDown().has(0)) {
+                        if (!this.ignorePointerUntilReleased[i]) {
+                            pointer.up(ev);
+                        }
+                    }
+                    this.ignorePointerUntilReleased[i] = false;
+                }
             }
         }
     }

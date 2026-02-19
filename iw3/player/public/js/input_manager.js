@@ -256,8 +256,9 @@ class InputManager {
         switch (action) {
             case INPUT_ACTIONS.MENU_TOGGLE: {
                 const autoExplorer = params.autoExplorer ?? false;
+                const cIdx = params.controllerIndex ?? -1;
                 if (!u.isAnyMenuVisible()) {
-                    u.showMainMenu();
+                    u.showMainMenu(cIdx);
                     if (autoExplorer) u.toggleExplorerVisibility();
                 } else {
                     if (autoExplorer) {

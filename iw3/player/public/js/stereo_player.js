@@ -456,7 +456,7 @@ class StereoPlayer extends THREE.Group {
                     this.uiManager.hideMainMenu(true); this.toggleControllerUIVisibility(false);
                 }
             } else {
-                this.uiManager.showMainMenu(); this.toggleControllerUIVisibility(true);
+                this.uiManager.showMainMenu(index); this.toggleControllerUIVisibility(true);
             }
         } else if (this.isControllerRotating) {
             // Save when rotation (Tilt) ends
