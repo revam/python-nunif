@@ -47,7 +47,6 @@ class StereoPlayer extends THREE.Group {
 
         // Video state
         this.videoElement = null;
-        this.isVideoPlaying = false;
         this.currentLoadId = 0;
         this.currentTrackUrl = null;
         this.lastPlaybackTimeSave = 0;
@@ -92,10 +91,9 @@ class StereoPlayer extends THREE.Group {
         if (!file) return;
 
         // IMMEDIATELY stop periodic saves to avoid race conditions during async operations
-        const wasPlaying = this.isVideoPlaying;
+        const wasPlaying = this.isPlaying;
         const oldVideoTime = (this.videoElement && wasPlaying) ? this.videoElement.currentTime : null;
         const oldFile = wasPlaying ? this.galleryManager.getCurrentItem() : null;
-        this.isVideoPlaying = false;
 
         const loadId = ++this.currentLoadId;
         const url = `/api/image?path=${encodeURIComponent(file.path)}`;
@@ -133,7 +131,7 @@ class StereoPlayer extends THREE.Group {
 
         if (this.videoElement && !forcedFormat) {
             // Save current playback position before switching
-            if (this.isVideoPlaying) {
+            if (this.isPlaying) {
                 const currentItem = this.galleryManager.getCurrentItem();
                 if (currentItem) {
                     await this.uiManager.updateFileConfig(currentItem, { playback_time: this.videoElement.currentTime });
@@ -143,7 +141,7 @@ class StereoPlayer extends THREE.Group {
             if (this.currentTrackUrl) URL.revokeObjectURL(this.currentTrackUrl);
             this.videoElement.onloadedmetadata = this.videoElement.onerror = null;
             this.videoElement.pause(); this.videoElement.src = ""; this.videoElement.load();
-            this.videoElement = null; this.isVideoPlaying = false;
+            this.videoElement = null; 
             
             // Dispose current textures
             if (this.stereoScreen.displayScreenLeft.material.map) {
@@ -167,7 +165,6 @@ class StereoPlayer extends THREE.Group {
                 this.videoElement.volume = this.uiManager.currentVolume;
 
                 this.videoElement.onended = () => {
-                    this.isVideoPlaying = false;
                     this.uiManager.updateFileConfig(file, { playback_time: 0 });
                     this.uiManager.syncUI(true);
                 };
@@ -208,7 +205,6 @@ class StereoPlayer extends THREE.Group {
 
                 const format = targetFormat || file.stereo_format || STEREO_FORMATS.SBS_FULL;
                 this.stereoScreen.updateTexture(texture, vw / vh, format);
-                this.isVideoPlaying = true;
                 this.lastPlaybackTimeSave = performance.now(); // Reset periodic save timer
                 this.loadSubtitles(file.path);
 
@@ -358,8 +354,8 @@ class StereoPlayer extends THREE.Group {
 
     togglePlayPause() {
         if (!this.videoElement) return;
-        if (this.isVideoPlaying) { this.videoElement.pause(); this.isVideoPlaying = false; }
-        else { this.videoElement.play(); this.isVideoPlaying = true; }
+        if (this.isPlaying) { this.pause(); }
+        else { this.play(); }
     }
 
     updateSubtitlesMode(show) {
@@ -504,7 +500,7 @@ class StereoPlayer extends THREE.Group {
         this.inputManager.update(delta);
 
         // Periodically save playback position
-        if (this.isVideoPlaying && this.videoElement) {
+        if (this.isPlaying && this.videoElement) {
             const now = performance.now();
             if (now - this.lastPlaybackTimeSave > 5000) {
                 this.savePlaybackPosition();
@@ -513,7 +509,7 @@ class StereoPlayer extends THREE.Group {
     }
 
     async savePlaybackPosition() {
-        if (!this.videoElement || !this.isVideoPlaying) return;
+        if (!this.videoElement || !this.isPlaying) return;
         const currentItem = this.galleryManager.getCurrentItem();
         if (currentItem) {
             await this.uiManager.updateFileConfig(currentItem, { playback_time: this.videoElement.currentTime });
@@ -523,6 +519,22 @@ class StereoPlayer extends THREE.Group {
 
     setRotationX(radian) {
         this.rotation.x = THREE.MathUtils.clamp(radian, LIMITS.screen_tiltMin * Math.PI / 180, LIMITS.screen_tiltMax * Math.PI / 180);
+    }
+
+    get isPlaying() {
+        return !!(this.videoElement && !this.videoElement.paused);
+    }
+
+    play() {
+        if (this.videoElement) {
+            this.videoElement.play();
+        }
+    }
+
+    pause() {
+        if (this.videoElement) {
+            this.videoElement.pause();
+        }
     }
 
     exitXR() { 

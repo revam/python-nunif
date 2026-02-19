@@ -14,6 +14,7 @@ class InputManager {
         this.isStickReset = [true, true];
         this.activeStickAxis = [null, null]; // 'x' or 'y'
         this.isMenuButtonPressed = [false, false];
+        this.isAButtonPressed = [false, false];
 
         // Feedback State
         this._atLimit = {}; // Tracks limit feedback for joysticks and translation
@@ -205,6 +206,10 @@ class InputManager {
             if (menuPressed && !this.isMenuButtonPressed[i]) this.dispatch(INPUT_ACTIONS.MENU_TOGGLE, { autoExplorer: true });
             this.isMenuButtonPressed[i] = menuPressed;
 
+            const aPressed = gamepad.buttons[4]?.pressed || gamepad.buttons[4]?.value > 0.5;
+            if (aPressed && !this.isAButtonPressed[i]) this.dispatch(INPUT_ACTIONS.PLAY_PAUSE, { controllerIndex: i });
+            this.isAButtonPressed[i] = aPressed;
+
             if (this.player.controllerRays[i]?.visible) {
                 this.player.controllerRays[i].scale.z = hitInfo.isUI ? (hitInfo.distance / 5.0) : 1.0;
             }
@@ -337,6 +342,15 @@ class InputManager {
                 if (this.player.videoElement) {
                     this.player.seek(this.player.videoElement.currentTime - 10);
                     this.player.savePlaybackPosition();
+                }
+                break;
+            case INPUT_ACTIONS.PLAY_PAUSE:
+                if (this.player.videoElement) {
+                    if (this.player.videoElement.paused) {
+                        this.player.play();
+                    } else {
+                        this.player.pause();
+                    }
                 }
                 break;
         }

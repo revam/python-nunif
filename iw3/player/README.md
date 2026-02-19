@@ -78,6 +78,7 @@ While browsers typically discourage trusting local servers in this manner, it is
 - **Navigate Images**: Tilt thumbstick Left/Right (during image playback).
 - **Seek**: Tilt thumbstick Left/Right (during video playback).
 - **Page Navigation**: Tilt thumbstick Up/Down (in File Explorer).
+- **Play/Pause**: A or X buttons (during video playback).
 
 Additional screen-specific shortcuts are detailed in the **Screen Settings** section below.
 
