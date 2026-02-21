@@ -144,3 +144,7 @@
 "Swap left image and right image": "左右の画像を入れ替え"
 "AutoCrop": "自動クロップ"
 "Enable model compiling": "モデルのコンパイルを有効化"
+
+# iw3.player
+"Media Directory": "メディアディレクトリ"
+"Please select a valid Media Directory.": "有効なメディアディレクトリを選択してください"

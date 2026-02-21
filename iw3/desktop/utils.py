@@ -218,7 +218,8 @@ def try_switch_mlbw_model(old_divergence, new_divergence, old_side_model, args):
 def iw3_desktop_main(args, init_wxapp=True):
     init_num_threads(args.gpu[0])
 
-    if not (args.full_sbs or args.rgbd or args.half_rgbd):
+    if not any([args.full_sbs, args.tb, args.half_tb,
+                args.cross_eyed, args.rgbd, args.half_rgbd, args.anaglyph]):
         args.half_sbs = True
 
     if args.user or args.password:
